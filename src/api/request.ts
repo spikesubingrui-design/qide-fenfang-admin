@@ -45,7 +45,7 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<ApiRe
     if (res.status === 401) {
       localStorage.removeItem('admin_token')
       localStorage.removeItem('admin_info')
-      window.location.href = '/login'
+      window.location.hash = '#/login'
       return { success: false, message: '登录已过期', data: null as T }
     }
 
