@@ -24,7 +24,7 @@ const menus = [
   { key: '/staff', icon: <TeamOutlined />, label: '员工管理' },
   { key: '/salary', icon: <DollarOutlined />, label: '薪酬管理' },
   { key: '/performance', icon: <TrophyOutlined />, label: '业绩目标' },
-  { key: '/points', icon: <StarOutlined />, label: '积分管理' },
+  { key: '/points', icon: <StarOutlined />, label: '绩效考核' },
   { key: '/stats', icon: <BarChartOutlined />, label: '数据报表' },
   { key: '/inventory', icon: <InboxOutlined />, label: '库存管理' }
 ]

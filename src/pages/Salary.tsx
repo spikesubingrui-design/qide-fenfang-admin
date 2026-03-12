@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from 'react'
 import {
-  Card, Table, Button, Space, Tag, message, Modal, Form, Select,
+  Alert, Card, Table, Button, Space, Tag, message, Modal, Form, Select,
   InputNumber, DatePicker, Tabs, Descriptions, Statistic, Row, Col, Input
 } from 'antd'
 import { get, post } from '../api/request'
@@ -26,6 +26,22 @@ interface ManualRecord {
   id: number; staffId: number; staffName?: string
   serviceName: string; quantity: number; unitFee: number; totalFee: number
   serviceDate: string; remark?: string
+}
+
+function getRolePriority(role?: string | null) {
+  const value = String(role || '').toLowerCase()
+  if (!value) return 99
+  if (
+    value.includes('集团管理')
+    || value.includes('总经理')
+    || value.includes('经理')
+    || value.includes('director')
+    || value.includes('人事主管')
+    || value.includes('护理主任')
+  ) return 1
+  if (value.includes('店长')) return 2
+  if (value.includes('主管') || value.includes('主任助理')) return 3
+  return 10
 }
 
 export default function Salary() {
@@ -65,7 +81,13 @@ export default function Salary() {
     try {
       const res = await get<MonthlySalary[]>('/salary/monthly', { year, month })
       const data = res.data as any
-      setMonthlyList(Array.isArray(data) ? data : data?.data ?? [])
+      const list = Array.isArray(data) ? data : data?.data ?? []
+      const sortedList = [...list].sort((a, b) => {
+        const roleDiff = getRolePriority(a.staffRole) - getRolePriority(b.staffRole)
+        if (roleDiff !== 0) return roleDiff
+        return Number(b.totalSalary || 0) - Number(a.totalSalary || 0)
+      })
+      setMonthlyList(sortedList)
     } catch (e: any) {
       message.error(e.message || '加载失败')
     }
@@ -204,6 +226,13 @@ export default function Salary() {
           </Space>
         }
       >
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="管理层列表排序说明"
+          description="月薪列表默认按职位层级从高到低展示；同职位时，再按月薪金额从高到低排序。"
+        />
         <Tabs activeKey={tab} onChange={setTab} items={[
           {
             key: 'monthly', label: '月薪管理',
